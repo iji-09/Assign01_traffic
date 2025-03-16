@@ -107,7 +107,9 @@ main.cpp 코드에서는 **TaskScheduler 라이브러리**를 활용하여 비�
 ## 회로 연결 이미지
 
 아래 이미지는 틴커캐드로 구현한 대략적인 회로입니다.
-![image](https://github.com/user-attachments/assets/b9275c55-3366-44a6-963f-a3e2bb1c6dd2)
+![스크린샷 2025-03-16 150852](https://github.com/user-attachments/assets/03bead83-e5e5-4b03-8b2d-1a67d55cd31d)
+
+
 
 실제 구현 회로는 아래와 같습니다.
-![KakaoTalk_20250316_111255504](https://github.com/user-attachments/assets/460e87d4-3dca-4f92-92d1-01fc973b2698)
+![KakaoTalk_20250316_111255504](https://github.com/user-attachments/assets/a8b4d77c-03ac-46c0-8beb-94dabbb0b700)
