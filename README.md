@@ -3,7 +3,8 @@
 
 ## 아두이노 동작 영상
 
-https://youtu.be/w8h2MnZb1uU?si=IlxCggaI5-AUnTyC
+[![프로젝트 시연 영상](https://img.youtube.com/vi/w8h2MnZb1uU/0.jpg)](https://youtu.be/w8h2MnZb1uU?si=IlxCggaI5-AUnTyC)
+
 
 ---
 
