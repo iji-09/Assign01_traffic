@@ -81,29 +81,6 @@ async function setup() {
 
 }
 
-
-
-// 🔍 사용 가능한 포트 리스트를 업데이트하여 표시
-async function updatePortList(portSelect) {
-    try {
-        const ports = await navigator.serial.getPorts(); // 사용 가능한 포트 가져오기
-        console.log("searched ports:", ports);
-
-        portSelect.html("");
-        portSelect.option("Select port");
-
-        ports.forEach(port => {
-            portSelect.option(port);
-        });
-
-        if (ports.length === 0) {
-            console.log("Not able port");
-        }
-    } catch (err) {
-        console.error("port error:", err);
-    }
-}
-
 // 아두이노 연결 버튼 클릭 시 실행
 async function connectBtnClick(portSelect) {
     if (!isConnected) {
@@ -143,7 +120,7 @@ async function readSerialData() {
 
                 let lines = serialBuffer.split("\n");
                 for (let i = 0; i < lines.length - 1; i++) {
-                    console.log("from Arduino:", lines[i].trim());
+                    //console.log("from Arduino:", lines[i].trim());
                     updateTrafficState(lines[i].trim());
                 }
                 serialBuffer = lines[lines.length - 1];
@@ -169,7 +146,7 @@ function updateTrafficState(data) {
         let newBrightness = parseInt(data.split(":")[1].trim(), 10);
         brightnessSlider.value(newBrightness); // 슬라이더 값 업데이트
         brightness = newBrightness; // 내부 변수도 업데이트
-        console.log("Arduino → p5: brightness:", newBrightness);
+        //console.log("Arduino → p5: brightness:", newBrightness);
     }
     
     
@@ -199,20 +176,19 @@ function updateTrafficState(data) {
     else if (data === "BUTTON2_OFF") {
         isBlinking = false;
         isTraffic = true;
+        stopAll();
         mode = "normal";
         console.log("Arduino B2 Off");
     }
 
     else if (data === "BUTTON3_ON") {
+        stopAll();
         isTraffic = true;
-        isRedOnly = false;
-        isBlinking = false;
         mode = "normal";
         console.log("Arduino B3 On");
     }
     else if (data === "BUTTON3_OFF") {
-        isTraffic = false;
-        mode = "stopped";
+        stopAll();
         console.log("Arduino B3 Off");
     }
 }
@@ -248,7 +224,7 @@ function stopAll() {
     isTraffic = false;
     // 모드를 "stopped"로 바꿔서 어떤 기능도 없는 상태로 만듦
     mode = "stopped";
-    console.log("All stop");
+    //console.log("All stop");
     
     // 화면 표시를 위해 lastChange를 초기화
     lastChange = millis();
@@ -266,39 +242,18 @@ function toggleRedOnly() {
         isRedOnly = true; 
         mode = "red-only";
         currentLight = "red";  
-        console.log("Red Led only ON");
+        console.log("p5 / Red Led only ON");
     } 
-    // 빨간 LED만 켜진 상태라면
-    else {
-        // "red-only" 상태에서 버튼 2(모든 LED 깜빡이기) -> ok
-        if (isBlinking === true) {
-            stopAll();  // 모든 기능 종료
+    // 빨간 LED만 켜져있는 상태라면
+    else if(mode === "red-only") {
+        mode = !mode;
+        stopAll();  // 모든 기능 종료
 
-            sendSerialData("b"); // 모든 LED 깜빡이기 시작
-            isBlinking = true;  // 깜빡이기 모드 유지
-            mode = "blinking";
-            console.log("Red Led only OFF / All Blink ON");
-        } 
-        // "red-only" 상태에서 버튼 3(신호등 기능) -> ok
-        else if (toggleTraffic === true) { // 신호등 기능이 켜져있다면
-            stopAll();  // 모든 기능 종료
-            // 신호등 기능 시작
-            sendSerialData("1");
-            isTraffic = true;
-            mode = "normal";
-            console.log("Red Led only OFF / Traffic ON");
-        }
-        // 버튼2 토글 -> ok (아두이노랑도 연결ok)
-        else {
-            stopAll();  // 모든 기능 종료
-
-            sendSerialData("1");
-            isTraffic = true;
-            mode = "normal";
-            console.log("Red Led only OFF");
-        }
-          
-       
+        sendSerialData("1");
+        isTraffic = true;
+        mode = "normal";
+        console.log("p5 / Red Led only OFF");
+        
     }
 }
     
@@ -316,7 +271,7 @@ function toggleBlinking() {
         
         lastChange = millis(); 
         ledOn = false;
-        console.log("All Led Blink ON");
+        console.log("p5 / All Led Blink ON");
     } 
 
     // 모든 LED가 깜빡이는 상태라면 
@@ -329,14 +284,14 @@ function toggleBlinking() {
             sendSerialData("r"); // 버튼1 다시 시작
             mode = "red-only"; // red-only 모드로 변경
             isRedOnly = true; // BUTTON 1 활성화
-            console.log("all Led Blink OFF / Red Led only ON");
+            console.log("p5 / all Led Blink OFF & Red Led only ON");
         }
         // 버튼2일 때 버튼 3누르면
         else if(isTraffic) { 
             sendSerialData("1"); // 신호등 기능 다시 시작
             mode = "normal"; // normal 모드로 변경
             isTraffic = true; // BUTTON 3 활성화
-            console.log("all Led Blink OFF / Traffic ON");
+            console.log("p5 / all Led Blink OFF & Traffic ON");
         }
         // 버튼2일 때 버튼 2 다시 누르면
         else {
@@ -346,7 +301,7 @@ function toggleBlinking() {
             sendSerialData("1"); // 신호등 기능 다시 시작
             mode = "normal"; // normal 모드로 변경
             isTraffic = true; // BUTTON 3 활성화
-            console.log("all Led Blink OFF / Traffic ON");
+            console.log("p5 / all Led Blink OFF");
         }
     }
 }
@@ -398,14 +353,14 @@ function toggleTraffic() {
         sendSerialData("1"); // 신호등 기능 시작
         mode = "normal"; // normal 모드로 변경
         isTraffic = true; // 신호등 기능 활성화
-        console.log("p5 Traffic ON");
+        console.log("p5 / Traffic ON");
     } 
     // 신호등 기능이 켜진 상태라면
     else {
         stopAll(); // 모든 기능 종료(p5)
         sendSerialData("0");  // 신호등 기능 중지(아두이노)
         mode = "stopped";
-        console.log("p5 Traffic OFF");
+        console.log("p5 / Traffic OFF");
     }
 }
 

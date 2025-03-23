@@ -18,7 +18,6 @@ const int POTENTIOMETER_PIN = A0;
 unsigned long lastBrightnessUpdate = 0; // 마지막으로 밝기 값을 전송한 시간
 const unsigned long brightnessInterval = 500; // 밝기 값 전송 간격(ms)
 
-
 // 시리얼 입력 (r,b,0,1)을 받을 버퍼
 char serialCommand;
 
@@ -95,6 +94,7 @@ void loop() {
   ts.execute(); // TaskScheduler 실행
   adjustBrightness(); // 밝기 조절
   processSerialInput(); // 시리얼 입력 처리 (r, b, 0, 1)
+
 
   // 가변저항 값을 읽고 p5.js로 전송
   if (millis() - lastBrightnessUpdate >= brightnessInterval) {
@@ -206,7 +206,7 @@ void processSerialInput() {
         break;
         
       default:
-        Serial.println("fail");
+        Serial.println("❌ fail ❌");
         break;
     }
   }
@@ -244,44 +244,26 @@ void button1Interrupt() {
     digitalWrite(9, HIGH); // 아두이노 빨간불 켜기
   } // B1만 true
 
-
-
   // 버튼1이 켜져있었다면
   else if (B1_State == true) {
 
     B1_State = !B1_State; // false로 변경
 
-    // 버튼 1이 눌린 상태에서 버튼 2가 눌린다면 
-    if (B2_State == true) {
-      Serial.println("Red Led only OFF / All Blink ON");
-      stopState(); stopAllTask(); 
-      B2_State = true;
-      B2_allblink.restartDelayed(); // 깜빡이기 재시작
-    } // B2만 true인 상태
-
-    // 버튼 1이 눌린 상태에서 버튼 3이 눌린다면
-    else if (Traffic_State == true) {
-      Serial.println("Red Led only OFF / Traffic ON");
-      stopState(); stopAllTask();
-      Restart_Traffic(); // 신호등 기능 재시작
-    }
-
     // 버튼1이 다시 눌린 경우 (T->F)
-    else if (B1_State == false){
+    if (B1_State == false){
       Serial.println("BUTTON1_OFF");
       stopAllTask(); stopState(); // 모든 기능 중지
       Restart_Traffic(); // Traffic은 T가 된 상태
     } // Traffic만 true가 된 상태임
   }
+    
 }
 
 
 //------------버튼 2 인터럽트 함수-----------
 void button2Interrupt() {
 
-  // B2_State = !B2_State;
-
-  // 버튼 2가 꺼져있는 상태였다면(깜빡이게 만들어야 함)
+// 버튼 2가 꺼져있는 상태였다면(깜빡이게 만들어야 함)
   if (B2_State == false) {
     Serial.println("BUTTON2_ON");
     stopAllTask(); stopState();
@@ -293,32 +275,15 @@ void button2Interrupt() {
   else if (B2_State == true) { 
 
     B2_State = !B2_State; // 상태 반전 T->F
-    
-    // 버튼 2가 눌린 상태에서 버튼 1이 눌린다면
-    // 여기서 눌렀을 때 true가 되는 게 맞나?
-    if (B1_State == true) { 
-      Serial.println("All LED Blink OFF / Red LED only ON");
-      stopState(); stopAllTask(); // 모든 기능 중지
-
-      B1_State = true;  // 빨간 LED only ON
-      digitalWrite(9, HIGH); // 빨간불 켜기
-    }
-
-    // 버튼 2가 눌린 상태에서 버튼 3이 눌린다면
-    // 여기서 눌렀을 때 true가 되는 게 맞나?
-    else if (Traffic_State == true) {
-      Serial.println("All LED Blink OFF / Traffic ON");
-      stopState(); stopAllTask();
-      Restart_Traffic(); // 신호등 기능 재시작
-    }
 
     // 버튼 2가 눌린 상태에서 다시 버튼 2가 눌린다면
-    else if (B2_State == false) {
+    if (B2_State == false) {
       Serial.println("BUTTON2_OFF");
       stopState(); stopAllTask();
       Restart_Traffic(); // 신호등 기능 재시작
     } // Traffic만 true가 됨
   }
+  
 }
 
 
@@ -337,6 +302,7 @@ void button3Interrupt() { // 버튼을 눌렀을 때 실행됨
     Serial.println("BUTTON3_OFF");
     stopState(); stopAllTask();
   } // 전부 꺼버림 all false
+
 }
 
 
